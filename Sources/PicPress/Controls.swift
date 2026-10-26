@@ -31,12 +31,8 @@ enum UI {
 
     /// Gives a button the accent "primary action" look on every supported system.
     static func applyPrimaryTint(to button: NSButton) {
-        if #available(macOS 26.0, *) {
-            button.tintProminence = .primary
-        } else {
-            button.bezelColor = Palette.accent
-            button.contentTintColor = .white
-        }
+        button.bezelColor = Palette.accent
+        button.contentTintColor = .white
     }
 }
 
