@@ -1,0 +1,53 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          sw_vers
+          swift --version
+          clang --version | head -1
+
+      - name: Build app and CLI
+        run: make
+
+      - name: Run tests
+        run: make test
+
+      - name: Package
+        run: |
+          SUFFIX="${GITHUB_REF_NAME//\//-}"
+          ditto -c -k --keepParent dist/PicPress.app "dist/PicPress-${SUFFIX}.zip"
+          ls -lh dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PicPress-app
+          path: dist/PicPress-*.zip
+          if-no-files-found: error
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/PicPress-*.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/PicPress-*.zip --generate-notes --title "$GITHUB_REF_NAME"
+          fi
