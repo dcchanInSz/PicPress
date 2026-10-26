@@ -1,0 +1,14 @@
+# 构建与产物
+.build/
+dist/
+*.dSYM/
+*.dmg
+
+# macOS
+.DS_Store
+
+# 编辑器
+.vscode/
+.idea/
+*.xcodeproj/
+*.xcworkspace/
