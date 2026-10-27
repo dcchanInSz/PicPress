@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  PicPress 的 entitlements 故意保持为空。
+
+	  空列表 = 最小权限：
+	    • 不联网（没有 network.client / network.server）
+	    • 不读取照片库、通讯录、日历、位置、麦克风、摄像头
+	    • 不使用 Apple Events，因此不会出现「想控制访达」这类自动化弹窗
+	    • 不关闭库验证（disable-library-validation）、不开 JIT —— 所有 C 代码
+	      都以静态库形式链进可执行文件，运行时不需要额外特权
+
+	  App 只碰用户在拖放或选择面板里亲手交出来的文件，这是 macOS 唯一
+	  不会弹隐私弹窗的访问方式。想加能力之前请先问一句：这个能力会不会
+	  让用户多点一次「允许」？
+	-->
+</dict>
+</plist>

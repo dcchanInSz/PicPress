@@ -34,16 +34,16 @@
 
 ### 下载现成的 App
 
-到 [Releases](../../releases) 下载 `PicPress-1.0.0.zip`，解压后把 **PicPress.app** 拖到「应用程序」。
+到 [Releases](../../releases) 下载 `PicPress-1.0.0.dmg`，双击打开，把 **PicPress.app**
+拖进「应用程序」即可。
 
-第一次打开会被 Gatekeeper 拦一下（App 是本地 ad-hoc 签名，没有 Apple 开发者账号），
-**右键 → 打开** 即可，或者执行：
-
-```bash
-xattr -dr com.apple.quarantine /Applications/PicPress.app
-```
+发布包由 `make release` 产出：**Developer ID 签名 + Apple 公证 + 钉票据**。正常发布的版本
+双击即可打开，不会出现「无法验证开发者」「已损坏，无法打开」这类 Gatekeeper 弹窗。
 
 > 需要 macOS 14 Sonoma 或更高版本。
+
+如果你的副本还是本地构建的（未公证），首次打开会被 Gatekeeper 拦一下：**右键 → 打开**，
+或者 `xattr -dr com.apple.quarantine /Applications/PicPress.app`。
 
 ### 从源码构建
 
@@ -58,6 +58,10 @@ open dist/PicPress.app
 
 首次构建会自动下载 libwebp 1.5.0 源码（带 SHA-256 校验）并编译成静态库，
 之后的构建都会复用 `.build/` 里的产物。
+
+`make` 同时会自动签名：优先用 **Developer ID Application**，其次 **Apple Development**，
+再次 `make cert` 生成的本地自签名证书，最后才退回 ad-hoc。签名身份稳定，macOS 的隐私
+授权（例如「访问桌面文件夹」）就不会每构建一次重问一次。
 
 ### 命令行版
 
@@ -138,20 +142,38 @@ Sources/PicPress/            App 源码（AppKit + 手写 Auto Layout）
 Sources/PicPressCLI/         命令行工具（同一引擎）
 Sources/PicPressTests/       集成测试（20 项断言）
 Sources/PicPressSnapshot/    离屏渲染窗口截图，用来检查界面
-scripts/                     build / icon / test / snapshot 脚本
-Resources/                   Info.plist、AppIcon.icns
+scripts/                     build / sign / notarize / icon / test / snapshot 脚本
+  build.sh                    编译 + 调用 sign.sh
+  sign.sh                     选身份、Hardened Runtime、entitlements、验证
+  notarize.sh                 公证 App 与 DMG、钉票据、spctl 复验
+  make-cert.sh                生成稳定身份的本地自签名证书
+  doctor.sh                   体检签名与 Gatekeeper 状态
+Resources/                   Info.plist、AppIcon.icns、PicPress.entitlements（空）
 ```
 
 ## 开发
 
 ```bash
-make             # 构建 App + CLI
+make             # 构建 App + CLI（自动签名）
 make test        # 集成测试：编码器、队列、导出、错误处理
 make snapshot    # 把窗口离屏渲染成 PNG（不需要截屏权限）
 make icon        # 重新生成图标
-make dmg         # 打包 dist/PicPress.dmg
+make sign        # 重新签名并打印 Gatekeeper 结论
+make cert        # 没有开发者证书时，生成稳定身份的本地自签名证书
+make dmg         # 打包 dist/PicPress.dmg（含签名）
+make release     # 签名 + 公证 + 钉票据，产出别人双击就能开的 dmg
+make doctor      # 体检：签名身份 / Hardened Runtime / Gatekeeper / 隐私授权
 make help        # 列出所有目标
 ```
+
+### 签名、公证与弹窗
+
+App 是**零第三方依赖、零网络、空 entitlements** 的：不联网、不读照片库、不发 Apple Events。
+用户能遇到的弹窗只剩 Gatekeeper，而它只认签名。
+
+- 本机开发：`make doctor` 看当前身份，`make cert` 固定一张本地证书，授权就不会反复弹
+- 分发给别人：申请一张 **Developer ID Application** 证书，然后
+  `NOTARY_PROFILE=… make release`（详见 [签名、公证与隐私弹窗](docs/signing.md)）
 
 ## 许可
 

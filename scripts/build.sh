@@ -45,8 +45,8 @@ TMPDIR="$BUILD/tmp" swiftc -O -swift-version 5 -target "$TARGET" \
   "$BUILD/libwebp/lib/libsharpyuv.a" \
   -o "$APP/Contents/MacOS/$APP_NAME"
 
-echo "• signing (ad-hoc)"
-codesign --force --sign - --timestamp=none "$APP"
+echo "• signing (best identity available)"
+"$ROOT/scripts/sign.sh" "$APP"
 
 echo "• compiling picpress-cli"
 TMPDIR="$BUILD/tmp" swiftc -O -swift-version 5 -target "$TARGET" \
@@ -60,6 +60,8 @@ TMPDIR="$BUILD/tmp" swiftc -O -swift-version 5 -target "$TARGET" \
   "$BUILD/libwebp/lib/libwebp.a" \
   "$BUILD/libwebp/lib/libsharpyuv.a" \
   -o "$DIST/picpress-cli"
+
+"$ROOT/scripts/sign.sh" --quiet "$DIST/picpress-cli"
 
 echo "✓ built:"
 echo "   $APP"

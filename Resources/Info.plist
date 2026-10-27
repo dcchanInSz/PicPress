@@ -28,6 +28,24 @@
 	<string>14.0</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>NSApplicationSupportsSecureRestorableState</key>
+	<true/>
+	<!--
+	  Files & Folders 隐私弹窗只会出现在「App 自己去翻受保护目录」的时候。
+	  PicPress 只碰拖进来或在选择面板里点选的文件 —— 那是用户明确的授权，
+	  系统直接放行，不会弹窗。下面几段用途说明只在极端情况下（比如某个目录
+	  被别的进程塞进来）才会出现，写清楚是为了让用户一眼看懂，而不是被吓到。
+	-->
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>只读取你拖入或亲手选择的图片，在本机完成压缩；不会扫描、上传或统计你的文件。</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>只读取你拖入或亲手选择的图片，在本机完成压缩；不会扫描、上传或统计你的文件。</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>只读取你拖入或亲手选择的图片，在本机完成压缩；不会扫描、上传或统计你的文件。</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>读取你从外接磁盘拖入的图片并输出 WebP，不保留、不上传任何副本。</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>读取你从网络卷拖入的图片并输出 WebP，不保留、不上传任何副本。</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>MIT License</string>
 	<key>NSPrincipalClass</key>
